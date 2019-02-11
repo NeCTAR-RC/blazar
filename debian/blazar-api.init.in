@@ -1,0 +1,16 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          blazar-api
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Should-Start:      mysql postgresql rabbitmq-server keystone
+# Should-Stop:       mysql postgresql rabbitmq-server keystone
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: blazar API
+# Description:       Provides the Blazar API service
+### END INIT INFO
+
+DESC="OpenStack Blazar API"
+PROJECT_NAME=blazar
+NAME=blazar-api

@@ -1,0 +1,8 @@
+/var/log/blazar/*.log {
+    daily
+    missingok
+    compress
+    delaycompress
+    notifempty
+    copytruncate
+}

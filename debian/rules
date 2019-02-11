@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+DEBVERS ?= $(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+VERSION ?= $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[-].*//' -e 's/~/./g')
+export OSLO_PACKAGE_VERSION=$(VERSION)
+export PBR_VERSION=$(VERSION)
+SHELL := /bin/sh -e
+
+include /usr/share/openstack-pkg-tools/pkgos.make
+
+%:
+	dh $@ --with python2,systemd
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f debian/*.upstart debian/*.init debian/*.service .testrepository
+	rm -f etc/blazar/blazar.conf
+
+get-orig-source:
+	uscan --verbose --force-download --rename --destdir=../build-area
+
+override_dh_install:
+	PYTHONPATH=$(CURDIR) oslopolicy-sample-generator --config-file=etc/blazar/blazar-policy-generator.conf
+	PYTHONPATH=$(CURDIR) oslo-config-generator --config-file=etc/blazar/blazar-config-generator.conf
+	cp etc/blazar/blazar.conf.sample etc/blazar/blazar.conf
+	dh_install --fail-missing
+
+ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
+override_dh_auto_test:
+	OS_TEST_PATH=./blazar/tests/unit ostestr
+endif

@@ -1,0 +1,19 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          blazar-manager
+# Required-Start:    $network $local_fs $remote_fs $syslog
+# Required-Stop:     $remote_fs
+# Should-Start:      mysql postgresql rabbitmq-server keystone
+# Should-Stop:       mysql postgresql rabbitmq-server keystone
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Blazar Manager
+# Description:       Provide Manager for blazar
+### END INIT INFO
+
+# Author: Sam Morrison <sorrison@gmail.com>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="OpenStack Blazar Manager"
+PROJECT_NAME=blazar
+NAME=blazar-manager

@@ -1,0 +1,4 @@
+etc/blazar/blazar.conf     etc/blazar
+etc/blazar/policy.yaml.sample usr/share/blazar
+usr/bin/blazar-db-manage usr/bin
+usr/bin/blazar-rpc-zmq-receiver usr/bin

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e 
+
+if [ "$1" = "configure" ]
+then
+	if ! getent group blazar > /dev/null 2>&1
+	then
+		addgroup --system blazar >/dev/null
+	fi
+	if ! getent passwd blazar > /dev/null 2>&1
+	then
+		adduser --system --home /var/lib/blazar --ingroup blaxar --no-create-home --shell /bin/false blazar
+	fi
+	chown -R blazar:blazar /var/lib/blazar/
+
+	chown -R blazar:adm /var/log/blazar/ 
+	chmod 0750 /var/log/blazar/
+
+    chown -R root:blazar /etc/blazar/
+    chmod 0755 /etc/blazar/
+    chmod -f 0640 /etc/blazar/blazar.conf || :
+
+fi
+
+#DEBHELPER#
