@@ -10,7 +10,7 @@ then
 	fi
 	if ! getent passwd blazar > /dev/null 2>&1
 	then
-		adduser --system --home /var/lib/blazar --ingroup blaxar --no-create-home --shell /bin/false blazar
+		adduser --system --home /var/lib/blazar --ingroup blazar --no-create-home --shell /bin/false blazar
 	fi
 	chown -R blazar:blazar /var/lib/blazar/
 
