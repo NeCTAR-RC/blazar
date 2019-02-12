@@ -480,7 +480,7 @@ class NovaInventory(NovaClientWrapper):
             return {'id': hypervisor.id,
                     'availability_zone': az_name,
                     'hypervisor_hostname': hypervisor.hypervisor_hostname,
-                    'service_name': hypervisor.service['host'],
+                    'service_name': hypervisor.service['host'].split('@')[-1],
                     'vcpus': hypervisor.vcpus,
                     'cpu_info': cpu_info,
                     'hypervisor_type': hypervisor.hypervisor_type,
