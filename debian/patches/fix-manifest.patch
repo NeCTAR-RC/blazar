@@ -1,0 +1,12 @@
+diff --git a/MANIFEST.in b/MANIFEST.in
+index d785bec..e33ba66 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -4,6 +4,7 @@ include ChangeLog
+ include LICENSE
+ 
+ recursive-include blazar/locale *
++recursive-include blazar *
+ 
+ exclude .gitignore
+ exclude .gitreview
