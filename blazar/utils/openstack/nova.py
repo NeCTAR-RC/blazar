@@ -114,7 +114,7 @@ class BlazarNovaClient(object):
         project_domain_name = kwargs.pop('project_domain_name', None)
         auth_url = kwargs.pop('auth_url', None)
 
-        if ctx is None:
+        if ctx is None and project_name is None:
             try:
                 ctx = context.current()
             except RuntimeError:
