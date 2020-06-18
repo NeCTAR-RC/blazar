@@ -18,13 +18,14 @@ eventlet.monkey_patch(
     os=True, select=True, socket=True, thread=True, time=True)
 
 import flask
-from keystonemiddleware import auth_token
 from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_middleware import debug
 from stevedore import enabled
 from werkzeug import exceptions as werkzeug_exceptions
 
+
+from blazar.api import keystone
 from blazar.api.v1 import api_version_request
 from blazar.api.v1 import request_id
 from blazar.api.v1 import request_log
@@ -99,6 +100,6 @@ def make_app():
 
     app.wsgi_app = request_id.BlazarReqIdMiddleware(app.wsgi_app)
     app.wsgi_app = request_log.RequestLog(app.wsgi_app)
-    app.wsgi_app = auth_token.filter_factory(app.config)(app.wsgi_app)
+    app.wsgi_app = keystone.SkippingAuthProtocol(app.wsgi_app, app.config)
 
     return app
