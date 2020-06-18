@@ -13,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest import mock
+
 import flask
-from keystonemiddleware import auth_token
 from oslo_config import cfg
 from werkzeug import exceptions as werkzeug_exceptions
 
+from blazar.api import keystone
 from blazar.api.v1 import app
 from blazar.api.v1.leases import v1_0 as lease_api_v1_0
 from blazar.api.v1.oshosts import v1_0 as host_api_v1_0
@@ -32,10 +34,10 @@ class AppTestCase(tests.TestCase):
         self.app = app
         self.api_utils = api_utils
         self.flask = flask
-        self.auth_token = auth_token
+        self.auth_token = keystone
 
         self.render = self.patch(self.api_utils, 'render')
-        self.fake_ff = self.patch(self.auth_token, 'filter_factory')
+        self.fake_ff = self.patch(self.auth_token, 'SkippingAuthProtocol')
 
         self.ex = werkzeug_exceptions.HTTPException()
         self.ex.code = 1313
@@ -71,7 +73,8 @@ class AppTestCase(tests.TestCase):
     def test_make_app(self):
         fake_app = self.patch(self.flask, 'Flask')
         self.app.make_app()
-        self.fake_ff.assert_called_once_with(fake_app().config)
+        self.fake_ff.assert_called_once_with(mock.ANY,
+                                             fake_app().config)
 
 
 class AppTestCaseForHostsPlugin(tests.TestCase):

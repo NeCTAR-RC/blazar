@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from oslo_middleware import healthcheck
 from oslo_serialization import jsonutils
 import six
 
@@ -28,6 +29,7 @@ class VersionSelectorApplication(object):
         self._response_headers = []
         self.v1 = v1_app.make_app()
         self.v2 = v2_app.make_app()
+        self.oslo_healthcheck = healthcheck.Healthcheck.app_factory({})
 
     def _append_versions_from_app(self, versions, app, environ):
         tmp_versions = app(environ, self.internal_start_response)
@@ -67,6 +69,8 @@ class VersionSelectorApplication(object):
             else:
                 start_response("204 No Content", [])
                 return []
+        elif environ['PATH_INFO'] == '/healthcheck':
+            return self.oslo_healthcheck(environ, start_response)
         else:
             if environ['PATH_INFO'].startswith('/v1'):
                 return self.v1(environ, start_response)
