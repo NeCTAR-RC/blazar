@@ -26,6 +26,7 @@ from stevedore import enabled
 from werkzeug import exceptions as werkzeug_exceptions
 
 from blazar.api.v1 import utils as api_utils
+from blazar.api import keystone
 
 
 LOG = logging.getLogger(__name__)
@@ -92,6 +93,6 @@ def make_app():
     if cfg.CONF.log_exchange:
         app.wsgi_app = debug.Debug.factory(app.config)(app.wsgi_app)
 
-    app.wsgi_app = auth_token.filter_factory(app.config)(app.wsgi_app)
+    app.wsgi_app = keystone.SkippingAuthProtocol(app.wsgi_app, app.config)
 
     return app
