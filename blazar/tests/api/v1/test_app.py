@@ -71,10 +71,9 @@ class AppTestCase(tests.TestCase):
                 status="300 Multiple Choices")
 
     def test_make_app(self):
-        fake_app = self.patch(self.flask, 'Flask')
+        self.patch(self.flask, 'Flask')
         self.app.make_app()
-        self.fake_ff.assert_called_once_with(mock.ANY,
-                                             fake_app().config)
+        self.fake_ff.assert_called_once_with(mock.ANY, {})
 
 
 class AppTestCaseForHostsPlugin(tests.TestCase):
