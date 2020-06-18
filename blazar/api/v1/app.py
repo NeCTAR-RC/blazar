@@ -92,6 +92,6 @@ def make_app():
     if cfg.CONF.log_exchange:
         app.wsgi_app = debug.Debug.factory(app.config)(app.wsgi_app)
 
-    app.wsgi_app = keystone.SkippingAuthProtocol(app.wsgi_app, app.config)
+    app.wsgi_app = keystone.SkippingAuthProtocol(app.wsgi_app, {})
 
     return app
