@@ -271,7 +271,8 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
 
         return {'added': added_host_ids, 'removed': removed_host_ids}
 
-    def _create_flavor(self, reservation_id, vcpus, memory, disk, group_id):
+    def _create_flavor(self, reservation_id, vcpus, memory, disk, group_id,
+                       extra_specs={}):
         flavor_details = {
             'flavorid': reservation_id,
             'name': RESERVATION_PREFIX + ":" + reservation_id,
@@ -285,11 +286,10 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
         # Set extra specs to the flavor
         rsv_id_rc_format = reservation_id.upper().replace("-", "_")
         reservation_rc = "resources:CUSTOM_RESERVATION_" + rsv_id_rc_format
-        extra_specs = {
-            FLAVOR_EXTRA_SPEC: reservation_id,
-            "affinity_id": group_id,
-            reservation_rc: "1"
-            }
+
+        extra_specs.update({FLAVOR_EXTRA_SPEC: reservation_id,
+                            "affinity_id": group_id,
+                            reservation_rc: "1"})
         reserved_flavor.set_keys(extra_specs)
 
         return reserved_flavor
@@ -305,11 +305,13 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             'affinity' if inst_reservation['affinity'] else 'anti-affinity'
             )
 
-        reserved_flavor = self._create_flavor(reservation_id,
-                                              inst_reservation['vcpus'],
-                                              inst_reservation['memory_mb'],
-                                              inst_reservation['disk_gb'],
-                                              reserved_group.id)
+        reserved_flavor = self._create_flavor(
+            reservation_id,
+            inst_reservation['vcpus'],
+            inst_reservation['memory_mb'],
+            inst_reservation['disk_gb'],
+            reserved_group.id,
+            extra_specs=inst_reservation['extra_specs'])
 
         pool = nova.ReservationPool()
         pool_metadata = {
@@ -420,7 +422,8 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             'disk_gb': values['disk_gb'],
             'amount': values['amount'],
             'affinity': bool_from_string(values['affinity'], default=None),
-            'resource_properties': values['resource_properties']
+            'resource_properties': values['resource_properties'],
+            'extra_specs': values['extra_specs'],
             }
         instance_reservation = db_api.instance_reservation_create(
             instance_reservation_val)
