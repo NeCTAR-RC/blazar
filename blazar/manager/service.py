@@ -329,6 +329,7 @@ class ManagerService(service_utils.RPCServer):
                         reservation['lease_id'] = lease['id']
                         reservation['start_date'] = lease['start_date']
                         reservation['end_date'] = lease['end_date']
+                        reservation['extra_specs'] = lease_values['extra_specs']
                         self._create_reservation(reservation)
                 except Exception:
                     LOG.exception("Failed to create reservation for a lease. "
