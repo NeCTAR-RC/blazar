@@ -319,7 +319,7 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
         return {'added': added_host_ids, 'removed': removed_host_ids}
 
     def _create_flavor(self, reservation_id, vcpus, memory, disk,
-                       group_id=None):
+                       group_id=None, extra_specs={}):
         flavor_details = {
             'flavorid': reservation_id,
             'name': RESERVATION_PREFIX + ":" + reservation_id,
@@ -333,10 +333,10 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
         # Set extra specs to the flavor
         rsv_id_rc_format = reservation_id.upper().replace("-", "_")
         reservation_rc = "resources:CUSTOM_RESERVATION_" + rsv_id_rc_format
-        extra_specs = {
+        extra_specs.update({
             FLAVOR_EXTRA_SPEC: reservation_id,
             reservation_rc: "1"
-            }
+            })
         if group_id is not None:
             extra_specs["affinity_id"] = group_id
         reserved_flavor.set_keys(extra_specs)
@@ -353,7 +353,8 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             'reservation_id': reservation_id,
             'vcpus': inst_reservation['vcpus'],
             'memory': inst_reservation['memory_mb'],
-            'disk': inst_reservation['disk_gb']
+            'disk': inst_reservation['disk_gb'],
+            'extra_specs': inst_reservation.get('extra_specs', {})
         }
 
         pool_metadata = {
@@ -479,10 +480,14 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             'disk_gb': values['disk_gb'],
             'amount': values['amount'],
             'affinity': bool_from_string(values['affinity'], default=None),
-            'resource_properties': values['resource_properties']
+            'resource_properties': values['resource_properties'],
+            'extra_specs': values.get('extra_specs', {}),
             }
         instance_reservation = db_api.instance_reservation_create(
             instance_reservation_val)
+
+        # TODO(sorrison) this needs a schema change so it gets added above
+        instance_reservation['extra_specs'] = values.get('extra_specs', {})
 
         for host_id in hosts['added']:
             db_api.host_allocation_create({'compute_host_id': host_id,
