@@ -312,13 +312,14 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
         return {'added': added_host_ids, 'removed': removed_host_ids}
 
     def _create_flavor(self, reservation_id, vcpus, memory, disk, group_id,
-                       extra_specs={}):
+                       extra_specs={}, ephemeral=0):
         flavor_details = {
             'flavorid': reservation_id,
             'name': RESERVATION_PREFIX + ":" + reservation_id,
             'vcpus': vcpus,
             'ram': memory,
             'disk': disk,
+            'ephemeral': ephemeral or 0,
             'is_public': False
             }
         reserved_flavor = self.nova.nova.flavors.create(**flavor_details)
@@ -351,7 +352,9 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             inst_reservation['memory_mb'],
             inst_reservation['disk_gb'],
             reserved_group.id,
-            extra_specs=inst_reservation.get('extra_specs', {}))
+            extra_specs=inst_reservation.get('extra_specs', {}),
+            ephemeral=inst_reservation.get('ephemeral_gb', 0),
+        )
 
         pool = nova.ReservationPool()
         pool_metadata = {
@@ -421,7 +424,9 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
                                     reservation['vcpus'],
                                     reservation['memory_mb'],
                                     reservation['disk_gb'],
-                                    reservation['server_group_id'])
+                                    reservation['server_group_id'],
+                                    ephemeral=reservation.get(
+                                        'ephemeral_gb', 0))
             except nova_exceptions.ClientException:
                 LOG.exception("Failed to update Nova resources "
                               "for reservation %s", reservation['id'])
@@ -469,6 +474,7 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
             instance_reservation_val)
 
         # TODO(sorrison) this needs a schema change so it gets added above
+        instance_reservation['ephemeral_gb'] = values.get('ephemeral_gb', 0)
         instance_reservation['extra_specs'] = values.get('extra_specs', {})
 
         for host_id in hosts['added']:

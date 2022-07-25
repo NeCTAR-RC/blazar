@@ -709,7 +709,7 @@ class TestVirtualInstancePlugin(tests.TestCase):
         mock_nova.nova.flavors.create.assert_called_once_with(
             flavorid='reservation-id1',
             name='reservation:reservation-id1',
-            vcpus=2, ram=1024, disk=20, is_public=False)
+            vcpus=2, ram=1024, disk=20, ephemeral=0, is_public=False)
         fake_flavor.set_keys.assert_called_once_with(
             {'aggregate_instance_extra_specs:reservation': 'reservation-id1',
              'affinity_id': 'server_group_id1',
@@ -886,7 +886,7 @@ class TestVirtualInstancePlugin(tests.TestCase):
         mock_nova.nova.flavors.create.assert_called_once_with(
             flavorid='reservation-id1',
             name='reservation:reservation-id1',
-            vcpus=2, ram=1024, disk=10, is_public=False)
+            vcpus=2, ram=1024, disk=10, ephemeral=0, is_public=False)
         fake_flavor.set_keys.assert_called_once_with(
             {'aggregate_instance_extra_specs:reservation': 'reservation-id1',
              'affinity_id': 'group-1',
