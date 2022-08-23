@@ -365,7 +365,7 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
         pool = nova.ReservationPool()
         pool_metadata = {
             RESERVATION_PREFIX: reservation_id,
-            'filter_tenant_id': ctx.project_id,
+            'nectar:filter_tenant_id': ctx.project_id,
             'affinity_id': reserved_group.id
             }
         agg = pool.create(name=reservation_id, metadata=pool_metadata)
