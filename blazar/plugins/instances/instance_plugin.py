@@ -361,7 +361,7 @@ class VirtualInstancePlugin(base.BasePlugin, nova.NovaClientWrapper):
 
         pool_metadata = {
             RESERVATION_PREFIX: reservation_id,
-            'filter_tenant_id': ctx.project_id,
+            'nectar:filter_tenant_id': ctx.project_id,
             }
 
         if inst_reservation['affinity'] is not None:
