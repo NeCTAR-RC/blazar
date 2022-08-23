@@ -717,7 +717,7 @@ class TestVirtualInstancePlugin(tests.TestCase):
         fake_pool.create.assert_called_once_with(
             name='reservation-id1',
             metadata={'reservation': 'reservation-id1',
-                      'filter_tenant_id': 'fake-project',
+                      'nectar:filter_tenant_id': 'fake-project',
                       'affinity_id': 'server_group_id1'})
         mock_create_reservation_class.assert_called_once_with(
             'reservation-id1')
